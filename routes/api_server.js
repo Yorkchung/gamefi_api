@@ -9,24 +9,22 @@ router.get('/', function (req, res, next) {
   res.render('index', { title: 'API' });
 });
 /* Register page. */
-router.post('/register', function (req, res, next) {
-
+router.post('/register', async function (req, res, next) {
+  console.log('register');
   var userid = req.body.userid || req.query.userid || req.cookies.userid;
   var password = req.body.password || req.query.password || req.cookies.password;
+  const client = new MongoClient("mongodb://localhost:27017");
   console.log("userid:" + userid);
   console.log("pwd:" + password);
-  // Connect to the db
-  MongoClient.connect("mongodb://localhost:27017", function (err, client) {
-    if (err) throw err;
-    var db = client.db("admin");
-    var data = { "userid": userid, "password": password };
-    db.collection("member").insertOne(data, function (err, res) {
-      if (err) throw err;
-      console.log("1 document inserted");
-      client.close();
-    });
-    res.status(200).send({ success: true, "msg": { "status": 200, "message": "mongodb is running!!" } });
-  });
+  try {
+    await client.connect();
+    const check = await conn.createMongo(client, userid, password);
+    res.json({ success: true, "msg": { "status": 200, "message": `create '${userid}'` } });
+  } catch (e) {
+    console.log('db error');
+  } finally {
+    client.close();
+  }
 
 });
 /* Login page. */
@@ -43,7 +41,6 @@ router.post('/login', async function (req, res, next) {
     } else {
       try {
         await client.connect();
-        console.log('good');
         const check = await conn.readMongo(client, userid, password);
         if (check.pop() != null) {
           const token = login.getToken();
@@ -59,9 +56,9 @@ router.post('/login', async function (req, res, next) {
       }
     }
   } catch (error) {
-  console.log(error);
-  res.status(500).send({ "error": { "status": 500, "message": "server error!" } });
-}
+    console.log(error);
+    res.status(500).send({ "error": { "status": 500, "message": "server error!" } });
+  }
 });
 /* Fetch Data page. */
 router.post('/fetch', function (req, res, next) {
@@ -90,4 +87,42 @@ router.post('/fetch', function (req, res, next) {
   }
 });
 
+/* Update page. */
+router.post('/update', async function (req, res, next) {
+  console.log('update');
+  var userid = req.body.userid || req.query.userid || req.cookies.userid;
+  var password = req.body.password || req.query.password || req.cookies.password;
+  const client = new MongoClient("mongodb://localhost:27017");
+  console.log("userid:" + userid);
+  console.log("pwd:" + password);
+  try {
+    await client.connect();
+    const check = await conn.updateMongo(client, userid, password);
+    res.json({ success: true, "msg": { "status": 200, "message": `update '${userid}'` } });
+  } catch (e) {
+    console.log('db error');
+  } finally {
+    client.close();
+  }
+
+});
+/* Delete page. */
+router.post('/delete', async function (req, res, next) {
+  console.log('delete');
+  var userid = req.body.userid || req.query.userid || req.cookies.userid;
+  var password = req.body.password || req.query.password || req.cookies.password;
+  const client = new MongoClient("mongodb://localhost:27017");
+  console.log("userid:" + userid);
+  console.log("pwd:" + password);
+  try {
+    await client.connect();
+    const check = await conn.deleteMongo(client, userid, password);
+    res.json({ success: true, "msg": { "status": 200, "message": `delete '${userid}'` } });
+  } catch (e) {
+    console.log('db error');
+  } finally {
+    client.close();
+  }
+
+});
 module.exports = router;
