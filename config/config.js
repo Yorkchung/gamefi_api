@@ -4,5 +4,5 @@ module.exports = {
     //密碼
     passwd: "myblock",
     // 設定密鑰
-    SECRET: 'hyperledgerforjob'
+    SECRET: 'GameFiEther'
 }
