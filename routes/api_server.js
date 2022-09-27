@@ -100,8 +100,38 @@ router.post('/login', async function (req, res, next) {
   }
 });
 /* Fetch Data page. */
-router.post('/fetch', function (req, res, next) {
-  
+router.post('/fetch', async function (req, res, next) {
+  try {
+    console.log('fetch');
+    var account = req.body.account || req.query.account || req.cookies.account;
+    account = account.toLowerCase();
+    console.log("account:" + account);
+    const client = new MongoClient("mongodb://localhost:27017");
+    try {
+      await client.connect();
+      var query = { "account": account };
+      const check = await conn.readMongo(client, query);
+      if (check != "") {
+        var data = {};
+        data.userid = check[0].userid;
+        data.account = check[0].account;
+        data.job = check[0].job;
+        data.group = check[0].group;
+        data.encrypt_key = check[0].encrypt_key;
+        res.json({ success: true, "message": data });
+      } else {
+        res.json({ success: false, "message": "not found" });
+      }
+    } catch (e) {
+      console.log('db error');
+    } finally {
+      client.close();
+    }
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ "error": { "status": 500, "message": "server error!" } });
+  }
 });
 
 /* Update page. */

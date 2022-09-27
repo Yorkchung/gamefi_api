@@ -1,5 +1,6 @@
 {
   "name": "YORK image 4",
   "description": "test",
+  "value":22,
   "image": "http://10.0.2.2:3000/images/4.jpg"
 }
