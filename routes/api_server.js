@@ -39,6 +39,7 @@ router.post('/register', async function (req, res, next) {
         res.json({ success: true, "msg": { "status": 200, "message": `create '${userid}'` } });
       } catch (e) {
         console.log('db error');
+        throw e;
       } finally {
         client.close();
       }
@@ -97,6 +98,7 @@ router.post('/login', async function (req, res, next) {
         }
       } catch (e) {
         console.log('db error');
+        throw e;
       } finally {
         client.close();
       }
@@ -132,6 +134,7 @@ router.post('/fetch', async function (req, res, next) {
       }
     } catch (e) {
       console.log('db error');
+      throw e;
     } finally {
       client.close();
     }
@@ -158,6 +161,7 @@ router.post('/update', async function (req, res, next) {
       res.json({ success: true, "msg": { "status": 200, "message": `update '${userid}'` } });
     } catch (e) {
       console.log('db error');
+      throw e;
     } finally {
       client.close();
     }
@@ -185,6 +189,7 @@ router.post('/delete', async function (req, res, next) {
       res.json({ success: true, "msg": { "status": 200, "message": `delete '${userid}'` } });
     } catch (e) {
       console.log('db error');
+      throw e;
     } finally {
       client.close();
     }
