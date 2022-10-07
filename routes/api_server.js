@@ -79,7 +79,7 @@ router.post('/login', async function (req, res, next) {
             console.log(hash);
             console.log(resp); // true
             if (resp) {
-              // const token = login.getToken();
+              const token = login.getToken();
               // res.cookie('token', token);
               // res.json({ success: true, Authorization_Token: token });
               var data = {};
@@ -88,6 +88,7 @@ router.post('/login', async function (req, res, next) {
               data.job = check[0].job;
               data.group = check[0].group;
               data.encrypt_key = check[0].encrypt_key;
+              data.Authorization_Token = token;
               res.json({ success: true, "message": data });
             } else {
               res.status(400).send({ success: false, "error": { "status": 400, "message": "帳號或密碼錯誤!" } });
@@ -114,6 +115,10 @@ router.post('/fetch', async function (req, res, next) {
   try {
     console.log('fetch');
     var account = req.body.account || req.query.account || req.cookies.account;
+    var Authorization_Token = req.headers.authorization.split(' ')[1];
+    console.log(Authorization_Token);
+    if(!login.checkUser(Authorization_Token))
+      res.status(403).send({ "error": { "status": 403, "message": "Authorization error!" } });
     account = account.toLowerCase();
     console.log("account:" + account);
     const client = new MongoClient("mongodb://localhost:27017");
@@ -151,6 +156,10 @@ router.post('/update', async function (req, res, next) {
     console.log('update');
     var userid = req.body.userid || req.query.userid || req.cookies.userid;
     var password = req.body.password || req.query.password || req.cookies.password;
+    var Authorization_Token = req.headers.authorization.split(' ')[1];
+    console.log(Authorization_Token);
+    if(!login.checkUser(Authorization_Token))
+      res.status(403).send({ "error": { "status": 403, "message": "Authorization error!" } });
     const client = new MongoClient("mongodb://localhost:27017");
     console.log("userid:" + userid);
     console.log("pwd:" + password);
@@ -178,6 +187,10 @@ router.post('/delete', async function (req, res, next) {
     console.log('delete');
     var userid = req.body.userid || req.query.userid || req.cookies.userid;
     var password = req.body.password || req.query.password || req.cookies.password;
+    var Authorization_Token = req.headers.authorization.split(' ')[1];
+    console.log(Authorization_Token);
+    if(!login.checkUser(Authorization_Token))
+      res.status(403).send({ "error": { "status": 403, "message": "Authorization error!" } });
     const client = new MongoClient("mongodb://localhost:27017");
     console.log("userid:" + userid);
     console.log("pwd:" + password);
