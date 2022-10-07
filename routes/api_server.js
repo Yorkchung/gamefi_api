@@ -10,8 +10,9 @@ var myHash = '';
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-  res.render('index', { title: 'API' });
+  res.send('This is API server');
 });
+
 /* Register page. */
 router.post('/register', async function (req, res, next) {
   console.log('register');
@@ -44,6 +45,7 @@ router.post('/register', async function (req, res, next) {
   });
 
 });
+
 /* Login page. */
 router.post('/login', async function (req, res, next) {
   try {
@@ -99,6 +101,7 @@ router.post('/login', async function (req, res, next) {
     res.status(500).send({ "error": { "status": 500, "message": "server error!" } });
   }
 });
+
 /* Fetch Data page. */
 router.post('/fetch', async function (req, res, next) {
   try {
@@ -154,6 +157,7 @@ router.post('/update', async function (req, res, next) {
   }
 
 });
+
 /* Delete page. */
 router.post('/delete', async function (req, res, next) {
   console.log('delete');
