@@ -115,29 +115,30 @@ router.post('/fetch', async function (req, res, next) {
     account = account.toLowerCase();
     console.log("account:" + account);
     const client = new MongoClient("mongodb://localhost:27017");
+    try {
+      await client.connect();
+      var query = { "account": account };
+      const check = await conn.readMongo(client, query);
+      if (check != "") {
+        var data = {};
+        data.userid = check[0].userid;
+        data.account = check[0].account;
+        data.job = check[0].job;
+        data.group = check[0].group;
+        data.encrypt_key = check[0].encrypt_key;
+        res.json({ success: true, "message": data });
+      } else {
+        res.json({ success: false, "message": "not found" });
+      }
+    } catch (e) {
+      console.log('db error');
+    } finally {
+      client.close();
+    }
+
   } catch (error) {
     console.log(error);
     res.status(500).send({ "error": { "status": 500, "message": "server error!" } });
-  }
-  try {
-    await client.connect();
-    var query = { "account": account };
-    const check = await conn.readMongo(client, query);
-    if (check != "") {
-      var data = {};
-      data.userid = check[0].userid;
-      data.account = check[0].account;
-      data.job = check[0].job;
-      data.group = check[0].group;
-      data.encrypt_key = check[0].encrypt_key;
-      res.json({ success: true, "message": data });
-    } else {
-      res.json({ success: false, "message": "not found" });
-    }
-  } catch (e) {
-    console.log('db error');
-  } finally {
-    client.close();
   }
 });
 
@@ -150,22 +151,21 @@ router.post('/update', async function (req, res, next) {
     const client = new MongoClient("mongodb://localhost:27017");
     console.log("userid:" + userid);
     console.log("pwd:" + password);
+    try {
+      await client.connect();
+      var query = { "userid": userid, "pwd_hash": pwd_hash, "hihi": "okok" };
+      const check = await conn.updateMongo(client, query);
+      res.json({ success: true, "msg": { "status": 200, "message": `update '${userid}'` } });
+    } catch (e) {
+      console.log('db error');
+    } finally {
+      client.close();
+    }
 
   } catch (error) {
     console.log(error);
     res.status(500).send({ "error": { "status": 500, "message": "server error!" } });
   }
-  try {
-    await client.connect();
-    var query = { "userid": userid, "pwd_hash": pwd_hash, "hihi": "okok" };
-    const check = await conn.updateMongo(client, query);
-    res.json({ success: true, "msg": { "status": 200, "message": `update '${userid}'` } });
-  } catch (e) {
-    console.log('db error');
-  } finally {
-    client.close();
-  }
-
 });
 
 /* Delete page. */
@@ -178,20 +178,20 @@ router.post('/delete', async function (req, res, next) {
     console.log("userid:" + userid);
     console.log("pwd:" + password);
 
+    try {
+      await client.connect();
+      var query = { "userid": userid, "pwd_hash": password };
+      const check = await conn.deleteMongo(client, query);
+      res.json({ success: true, "msg": { "status": 200, "message": `delete '${userid}'` } });
+    } catch (e) {
+      console.log('db error');
+    } finally {
+      client.close();
+    }
+
   } catch (error) {
     console.log(error);
     res.status(500).send({ "error": { "status": 500, "message": "server error!" } });
   }
-  try {
-    await client.connect();
-    var query = { "userid": userid, "pwd_hash": password };
-    const check = await conn.deleteMongo(client, query);
-    res.json({ success: true, "msg": { "status": 200, "message": `delete '${userid}'` } });
-  } catch (e) {
-    console.log('db error');
-  } finally {
-    client.close();
-  }
-
 });
 module.exports = router;
