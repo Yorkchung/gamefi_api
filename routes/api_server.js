@@ -15,35 +15,40 @@ router.get('/', function (req, res, next) {
 
 /* Register page. */
 router.post('/register', async function (req, res, next) {
-  console.log('register');
-  var userid = req.body.userid || req.query.userid || req.cookies.userid;
-  var password = req.body.password || req.query.password || req.cookies.password;
-  var group = req.body.group || req.query.group || req.cookies.group;
-  var account = req.body.account || req.query.account || req.cookies.account;
-  account = account.toLowerCase();
-  var job = req.body.job || req.query.job || req.cookies.job;
-  var encrypt_key = req.body.encrypt_key || req.query.encrypt_key || req.cookies.encrypt_key;
-  const client = new MongoClient("mongodb://localhost:27017");
-  // 加密
-  bcrypt.hash(password, saltRounds).then(async function (hash) {
-    // Store hash in your password DB.
-    var pwd_hash = hash;
-    console.log(pwd_hash);
-    console.log("userid:" + userid);
-    console.log("pwd:" + password);
-    try {
-      await client.connect();
-      var query = { "userid": userid, "pwd_hash": pwd_hash, "group": group, "account": account, "encrypt_key": encrypt_key, "job": job };
-      const check = await conn.createMongo(client, query);
-      res.json({ success: true, "msg": { "status": 200, "message": `create '${userid}'` } });
-    } catch (e) {
-      console.log('db error');
-    } finally {
-      client.close();
-    }
+  try {
+    console.log('register');
+    var userid = req.body.userid || req.query.userid || req.cookies.userid;
+    var password = req.body.password || req.query.password || req.cookies.password;
+    var group = req.body.group || req.query.group || req.cookies.group;
+    var account = req.body.account || req.query.account || req.cookies.account;
+    account = account.toLowerCase();
+    var job = req.body.job || req.query.job || req.cookies.job;
+    var encrypt_key = req.body.encrypt_key || req.query.encrypt_key || req.cookies.encrypt_key;
+    const client = new MongoClient("mongodb://localhost:27017");
+    // 加密
+    bcrypt.hash(password, saltRounds).then(async function (hash) {
+      // Store hash in your password DB.
+      var pwd_hash = hash;
+      console.log(pwd_hash);
+      console.log("userid:" + userid);
+      console.log("pwd:" + password);
+      try {
+        await client.connect();
+        var query = { "userid": userid, "pwd_hash": pwd_hash, "group": group, "account": account, "encrypt_key": encrypt_key, "job": job };
+        const check = await conn.createMongo(client, query);
+        res.json({ success: true, "msg": { "status": 200, "message": `create '${userid}'` } });
+      } catch (e) {
+        console.log('db error');
+      } finally {
+        client.close();
+      }
 
-  });
+    });
 
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ "error": { "status": 500, "message": "server error!" } });
+  }
 });
 
 /* Login page. */
@@ -110,41 +115,46 @@ router.post('/fetch', async function (req, res, next) {
     account = account.toLowerCase();
     console.log("account:" + account);
     const client = new MongoClient("mongodb://localhost:27017");
-    try {
-      await client.connect();
-      var query = { "account": account };
-      const check = await conn.readMongo(client, query);
-      if (check != "") {
-        var data = {};
-        data.userid = check[0].userid;
-        data.account = check[0].account;
-        data.job = check[0].job;
-        data.group = check[0].group;
-        data.encrypt_key = check[0].encrypt_key;
-        res.json({ success: true, "message": data });
-      } else {
-        res.json({ success: false, "message": "not found" });
-      }
-    } catch (e) {
-      console.log('db error');
-    } finally {
-      client.close();
-    }
-
   } catch (error) {
     console.log(error);
     res.status(500).send({ "error": { "status": 500, "message": "server error!" } });
+  }
+  try {
+    await client.connect();
+    var query = { "account": account };
+    const check = await conn.readMongo(client, query);
+    if (check != "") {
+      var data = {};
+      data.userid = check[0].userid;
+      data.account = check[0].account;
+      data.job = check[0].job;
+      data.group = check[0].group;
+      data.encrypt_key = check[0].encrypt_key;
+      res.json({ success: true, "message": data });
+    } else {
+      res.json({ success: false, "message": "not found" });
+    }
+  } catch (e) {
+    console.log('db error');
+  } finally {
+    client.close();
   }
 });
 
 /* Update page. */
 router.post('/update', async function (req, res, next) {
-  console.log('update');
-  var userid = req.body.userid || req.query.userid || req.cookies.userid;
-  var password = req.body.password || req.query.password || req.cookies.password;
-  const client = new MongoClient("mongodb://localhost:27017");
-  console.log("userid:" + userid);
-  console.log("pwd:" + password);
+  try {
+    console.log('update');
+    var userid = req.body.userid || req.query.userid || req.cookies.userid;
+    var password = req.body.password || req.query.password || req.cookies.password;
+    const client = new MongoClient("mongodb://localhost:27017");
+    console.log("userid:" + userid);
+    console.log("pwd:" + password);
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ "error": { "status": 500, "message": "server error!" } });
+  }
   try {
     await client.connect();
     var query = { "userid": userid, "pwd_hash": pwd_hash, "hihi": "okok" };
@@ -160,12 +170,18 @@ router.post('/update', async function (req, res, next) {
 
 /* Delete page. */
 router.post('/delete', async function (req, res, next) {
-  console.log('delete');
-  var userid = req.body.userid || req.query.userid || req.cookies.userid;
-  var password = req.body.password || req.query.password || req.cookies.password;
-  const client = new MongoClient("mongodb://localhost:27017");
-  console.log("userid:" + userid);
-  console.log("pwd:" + password);
+  try {
+    console.log('delete');
+    var userid = req.body.userid || req.query.userid || req.cookies.userid;
+    var password = req.body.password || req.query.password || req.cookies.password;
+    const client = new MongoClient("mongodb://localhost:27017");
+    console.log("userid:" + userid);
+    console.log("pwd:" + password);
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ "error": { "status": 500, "message": "server error!" } });
+  }
   try {
     await client.connect();
     var query = { "userid": userid, "pwd_hash": password };
