@@ -3,7 +3,7 @@ You can run this server with "npm start"app.js
 
 How to begin:
 1. First of all, you have to build a mongoDB.
-your monogoDB will like this:
+your mongoDB will like this:
 ![image](./image/mongoDB.png)
 2. set your mongoDB port and ip in api_server.js.
 3. run "npm start". That is all.
