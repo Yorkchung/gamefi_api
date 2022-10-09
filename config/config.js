@@ -1,8 +1,8 @@
 module.exports = {
     //帳號
-    username: "myblock",
+    username: "",
     //密碼
-    passwd: "myblock",
+    passwd: "",
     // 設定密鑰
-    SECRET: 'GameFiEther'
+    SECRET: ''
 }
